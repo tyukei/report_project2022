@@ -1,0 +1,326 @@
+\documentclass[a4j]{jsarticle}
+\usepackage{color}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{listings,jlisting}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{amssymb}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{pdfpages}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath}
+
+\lstset{
+backgroundcolor={\color[gray]{.85}},
+basicstyle={\small},
+identifierstyle={\small},
+commentstyle={\small\ttfamily \color[rgb]{0,0.5,0}},
+keywordstyle={\small\bfseries \color[rgb]{0.5,0,0.8}},
+ndkeywordstyle={\small},
+stringstyle={\small\ttfamily \color[rgb]{0,0,1}},
+frame={tb},
+breaklines=true,
+columns=[l]{fullflexible},
+numbers=left,
+xrightmargin=0zw,
+xleftmargin=3zw,
+numberstyle={\scriptsize},
+stepnumber=1,
+numbersep=1zw,
+morecomment=[l]{//}
+}
+\lstdefinestyle{customText}{
+backgroundcolor={\color[gray]{.85}},
+basicstyle={\small},
+identifierstyle={\small},
+commentstyle={\small\ttfamily \color[rgb]{0,0.5,0}},
+keywordstyle={\small\bfseries \color[rgb]{0.5,0,0.8}},
+ndkeywordstyle={\small},
+stringstyle={\small\ttfamily \color[rgb]{0,0,1}},
+frame={tb},
+breaklines=true,
+columns=[l]{fullflexible},
+numbers=left,
+xrightmargin=0zw,
+xleftmargin=3zw,
+numberstyle={\scriptsize},
+stepnumber=1,
+numbersep=1zw,
+morecomment=[l]{//}
+}
+\lstset{
+otherkeywords={Uword,Cpub,step},
+morekeywords={Uword,Cpub,step},
+classoffset=0, keywordstyle=\color{violet}, deletekeywords={step},
+classoffset=1, keywordstyle=\color{brown}, morekeywords={step},
+classoffset=0,
+}
+\lstdefinestyle{customC}{
+    language         = {C},
+    style            = {customText}
+}
+
+\pagestyle{fancy}
+\rhead{\thepage}
+\cfoot{\empty}
+\lhead{\leftmark}
+
+\title{プロジェクト実習２}
+\author{情報工学3年　20122041　中田継太}
+\date{\today}
+\begin{document}
+
+\thispagestyle{empty}
+
+\begin{figure}
+  \center
+  \includegraphics[width=150mm]{jikken-jouhou.pdf}
+\end{figure}
+
+\clearpage
+\setcounter{tocdepth}{2}
+\tableofcontents
+\clearpage
+\twocolumn
+
+\section{理論　\cite{cite:riron1}\cite{cite:riron2}}
+\subsection{4:4:4について}
+ディジタル画像は，縦横
+に並んだ画素（ピクセル）と呼ばれる単
+位の集まりで表現される．
+ディジタルカラー画像は，この
+ディジタル画像3枚の組で表すことが
+できる．
+輝度（Y）と色差（UとV）の組合せを用
+いる場合には，人間の視覚特性を利用
+してUとVの解像度を落とすことがで
+きる．解像度を落とさない画像のこ
+とを4:4:4，UとVにつ
+いて，それぞれ横方向を半分に間引
+いたものを4:2:2、U，Vについて縦・
+横方向の解像度をそれぞれ半分に落
+としたものを4:2:0または4:1:1と呼ぶ．\\
+4:2:0または4:1:1はともにもと画像から4分の１したものであるが,
+間引き方が異なる。
+4:2:0では、横方向に輝度の半分まで落とした後、 さらに縦方向にも色差信号を半分まで落とす。
+4:1:1は4:2:0同様、色差のデータ量を4分の1にまで落とすが、横方向に4つ分間引く点が4:2:0 と異なる。
+
+\section{実験の目的\cite{cite:object}}
+全体的な目標映像/画像の圧縮符号化に関する基礎的な考え方やスキルを習得。
+今週の目標は以下の２点である。
+\begin{itemize}
+  \item RGBチャンネルの画像の理解
+  \item  YUVは人間の視覚への効果の理解
+\end{itemize}
+
+\section{実験器具及びツール}
+Scilab
+
+
+\section{実現した機能の説明}
+Scilab スクリプトimage\_yuv.sce をベースと
+して，下記の機能を実現するScilab スクリプトの
+開発をおこなった。
+\subsection{スクリプト１}
+RGB 形式のR 成分をそのままとし，G とB
+成分を0 とする操作をR チャンネルと定義
+する．同様に，G チャンネルとB チャンネ
+ルが定義できる．RGB 画像を入力し，「画像
+の上部1/3 をR チャンネル，中部をG チャ
+ンネル，下部をB チャンネルとするRGB 画
+像」を生成する\\
+次にどのように実装したのか説明する。
+まず、im\_in\_rgbの値をim\_out\_rgbにコピーする。
+そして、上部１からheightの３分の１までの要素のチャンネル２と３の値を０にする。チャンネル２と３は緑と青のデータであるのでこの値を０にすることで赤だけのデータが抽出される。同様に、上部３分の１から３分の２までの要素のチャンネルの１と３の値を０とする。そうすることで上部３分の１から３分の２までの赤と青のデータを０とし、緑だけを抽出することができる。上部３分の２から最後までの要素のチャンネルの１と２の値を０とする。そうすることで下部３分の１の赤と緑のデータを０とし、青だけを抽出することができる。
+
+
+\subsection{スクリプト２}
+UV 成分の間引き処理を「YUV 形式のY 成分
+に値域[0,255]のランダム整数をXOR する」，
+および「YUV 形式のU 成分，V 成分に値域
+[0,255]のランダム整数をXOR する」処理に
+書き換える．\\
+次にどのように実装したのか説明する。
+まず、rand関数を用いて0から1までのランダムな小数を生成した。
+引数はheightとwidthとし、これからxorとる画素のサイズに合わせるようにした。
+このランダムな値の要素をもつ行列をaとした。\\
+続いて、aの値に255をかける。これはaの値が0から１の範囲であったため０から255の範囲に直す必要があった。この行列をbとした。\\
+そして、round関数でbの要素を整数化させ、キャストuint8でdouble型からint型に直した。これはのちにxorをとるときintとdoubleの型の競合が怒らないようにするために処理を行った。この０から255までのランダムな要素を持つ行列をrandom\_arrayとした。\\
+そして最後に、このrandom\_arrayとim\_in\_yのxorをとるためbitxorをとる。この一連の操作で機能を実現できた。\\
+U,V成分もY成分と同様にrando関数でheight×widthの行列を生成させる。そして各要素を255倍してやり、roudn関数で整数にまるめこむ。ただし、bitxorの引数はrandom\_arrayとim\_in\_uまたはrandom\_arrayとim\_in\_vにしてやる。
+
+\section{実験結果}
+\subsection{スクリプト１}
+実行すると図\ref{pic:rgb}のような画像が表示された。上部1/3が赤で中部が緑、そして下部1/3が青となっていることが分かる。要件が満たされていることが確認できる。
+\begin{figure}
+  \centering
+  \includegraphics[width=7cm]{rgb.png}
+  \caption{スクリプト１}
+  \label{pic:rgb}
+\end{figure}
+
+\subsection{スクリプト２}
+Y成分とランダム整数の排他的論理和をとったスクリプトを実行すると
+図\ref{pic:xor1}と図\ref{pic:xor2}が表示された。\\
+\begin{figure}
+  \centering
+  \includegraphics[width=7cm]{xory1.png}
+  \caption{スクリプト2}
+  \label{pic:xor1}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=7cm]{xory2.png}
+  \caption{スクリプト2}
+  \label{pic:xor2}
+\end{figure}
+
+
+次にUとV成分とランダム整数の排他的論理和をとったスクリプトを実行すると
+図\ref{pic:xouv1}と図\ref{pic:xouv2}が表示された。\\
+
+\begin{figure}
+  \centering
+  \includegraphics[width=7cm]{xoruv1.png}
+  \caption{スクリプト2}
+  \label{pic:xouv1}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=7cm]{xoruv2.png}
+  \caption{スクリプト2}
+  \label{pic:xouv2}
+\end{figure}
+
+
+
+\section{考察}
+\subsection{類似度の違いについて}
+Y成分をネガポジ反転したもの(図\ref{pic:xor1})は赤や黄色の円が映し出されていて、風船の場所がうっすらとみることができる。一方でUV成分をネガポジ反転したもの(図\ref{pic:xouv1})は色は抽出できていないものの、光の辺り方や風船の輪郭部分も抽出することができており、風船の形までしっかりと見ることができる。
+このように、処理画像と原画像の類似度が高いのは、UV成分をネガポジ反転したものであった。これは人間の視覚は輝度の違いには敏感であるが、色差の違いにはそれほど敏感でないことが関係していると考えられる。Yは輝度であり、Yを変えると人間は敏感に反応するため類似度が下がり、一方で、色差のUVを変えるとY程敏感でないため類似度は高いと感じるためだと考えられる。
+
+\subsection{ランダム整数について}
+Y成分とランダム整数の排他的論理和をとったスクリプトを実行すると
+図\ref{pic:xor1}と図\ref{pic:xor2}が表示されたが
+排他的論理和はランダムな整数でとるのでさらにもう一度実行してみた。
+すると図\ref{pic:xor3}と図\ref{pic:xor4}が表示された。
+\begin{figure}
+  \centering
+  \includegraphics[width=7cm]{xory3.png}
+  \caption{スクリプト2}
+  \label{pic:xor3}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=7cm]{xory4.png}
+  \caption{スクリプト2}
+  \label{pic:xor4}
+\end{figure}
+また次にUとV成分とランダム整数の排他的論理和をとったスクリプトを実行すると
+図\ref{pic:xouv1}と図\ref{pic:xouv2}が表示されたが排他的論理和はランダムな整数でとるのでさらにもう一度実行してみた。
+すると図\ref{pic:xouv3}と図\ref{pic:xouv4}が表示された。
+\begin{figure}
+  \centering
+  \includegraphics[width=7cm]{xoruv3.png}
+  \caption{スクリプト2}
+  \label{pic:xouv3}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=7cm]{xoruv4.png}
+  \caption{スクリプト2}
+  \label{pic:xouv4}
+\end{figure}
+図\ref{pic:xor1}と図\ref{pic:xor3}また、図\ref{pic:xouv1}と図\ref{pic:xouv3}を見比べてみるとほとんど違いが内容に見える。\\
+このようにランダムな整数を用いているのにも関わらず処理される画像とヒストグラムは毎回ほぼ同じものになることが疑問に感じた。
+Scilabの機能にある、実際のデータを見て考察してみた。
+\\まず、実際にランダムな整数が生成されているかどうか、ランダム行列の値を見てみた。
+表\ref{tab:random}と表\ref{tab:random2}は１回目と２回目に生成されたランダム配列である。確かに、数値はランダムに生成されていることが分かる。
+\begin{table}
+  \centering
+  \caption{random\_arrayのデータ}
+  \label{tab:random}
+    \includegraphics[width=8cm]{random_array.png}
+\end{table}
+
+\begin{table}
+  \centering
+  \caption{random\_array2のデータ}
+  \label{tab:random2}
+    \includegraphics[width=8cm]{random_array2.png}
+\end{table}
+
+次にbloons.pngのY成分を見てみる。表\ref{tab:in_y}はim\_in\_yの値である。これは実行回数に関わらず、bloons.pngからのデータなので、変わらない。
+\begin{table}
+  \centering
+  \caption{im\_in\_yのデータ}
+  \label{tab:in_y}
+    \includegraphics[width=8cm]{im_in_y.png}
+\end{table}
+
+そして、最後に、ランダム整数とy成分のEORをとった値im\_out\_yを見てみる。表\ref{tab:out_y}と表\ref{tab:out_y2}は１回目と２回目に生成されたim\_out\_yである。ここから、確かにim\_out\_yは１回目と２回目で違う値が生成されていることが分かる。一方で、このim\_out\_yの平均、分散、標準偏差をとってみると、表\ref{tab:data_im}のようになった。平均の差は0.01であり、分散、標準偏差から分かるように散らばり度合いもほぼ等しいものとなっていた。そのため、全体として、画素の値のY成分は大きな変化がなかったのだと考えられる。
+
+\begin{table}
+  \centering
+  \caption{im\_out\_yのデータ}
+  \label{tab:out_y}
+    \includegraphics[width=8cm]{im_out_y.png}
+\end{table}
+
+\begin{table}
+  \centering
+  \caption{im\_out\_y2のデータ}
+  \label{tab:out_y2}
+    \includegraphics[width=8cm]{im_out_y2.png}
+\end{table}
+
+\begin{table}
+  \centering
+  \caption{im\_in\_yのデータ}
+  \label{tab:data_im}
+  \begin{tabular}{|l|l|l|l|}
+    \hline
+    &平均&分散&標準偏差 \\ \hline
+    y\_1&127.36&5474.72&73.99 \\ \hline
+    y\_2&127.37&5469.30&73.95 \\ \hline
+
+  \end{tabular}
+\end{table}
+
+
+\section{演習２}
+\subsection{4:4:4について}
+YUVはそれぞれ８ビットの精度をもつ。
+また4:4:4は解像度を落とさない画像の場合なので
+\begin{equation*}
+  8+8+8=24 (bit)
+\end{equation*}
+
+\subsection{4:1:1について}
+YUVはそれぞれ８ビットの精度をもつ。
+また4:1:1はUとVについて，それぞれ横方向と縦方向に半分に間引
+いたものつまり4分の１にリサイズしたものなので、
+\begin{equation*}
+  8+8\times \frac{1}{4}+8\times \frac{1}{4}=12(bit)
+\end{equation*}
+
+\subsection{4:2:0について}
+YUVはそれぞれ８ビットの精度をもつ。
+また4:2:0はUとVについて，それぞれ横方向と縦方向に半分に間引
+いたものつまり4分の１にリサイズしたものなので、
+\begin{equation*}
+  8+8\times \frac{1}{4}+8\times \frac{1}{4}=12(bit)
+\end{equation*}
+
+\section{参考文献}
+\begin{thebibliography}{99}
+  \bibitem{cite:riron1}　https://www.ite.or.jp/contents/keywords/FILE-20120103130828.pdf
+  \bibitem{cite:riron2} https://videotech.densan-labs.net/articles/2017/08/28/yuv444-422-420.html
+  \bibitem{cite:object}　第2週目スライド p6 目標
+
+\end{thebibliography}
+
+
+
+\end{document}
