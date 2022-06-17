@@ -1,0 +1,520 @@
+\documentclass[a4j]{jsarticle}
+\usepackage{color}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{listings,jlisting}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{amssymb}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{pdfpages}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath}
+
+\lstset{
+backgroundcolor={\color[gray]{.85}},
+basicstyle={\small},
+identifierstyle={\small},
+commentstyle={\small\ttfamily \color[rgb]{0,0.5,0}},
+keywordstyle={\small\bfseries \color[rgb]{0.5,0,0.8}},
+ndkeywordstyle={\small},
+stringstyle={\small\ttfamily \color[rgb]{0,0,1}},
+frame={tb},
+breaklines=true,
+columns=[l]{fullflexible},
+numbers=left,
+xrightmargin=0zw,
+xleftmargin=3zw,
+numberstyle={\scriptsize},
+stepnumber=1,
+numbersep=1zw,
+morecomment=[l]{//}
+}
+\lstdefinestyle{customText}{
+backgroundcolor={\color[gray]{.85}},
+basicstyle={\small},
+identifierstyle={\small},
+commentstyle={\small\ttfamily \color[rgb]{0,0.5,0}},
+keywordstyle={\small\bfseries \color[rgb]{0.5,0,0.8}},
+ndkeywordstyle={\small},
+stringstyle={\small\ttfamily \color[rgb]{0,0,1}},
+frame={tb},
+breaklines=true,
+columns=[l]{fullflexible},
+numbers=left,
+xrightmargin=0zw,
+xleftmargin=3zw,
+numberstyle={\scriptsize},
+stepnumber=1,
+numbersep=1zw,
+morecomment=[l]{//}
+}
+\lstset{
+otherkeywords={Uword,Cpub,step},
+morekeywords={Uword,Cpub,step},
+classoffset=0, keywordstyle=\color{violet}, deletekeywords={step},
+classoffset=1, keywordstyle=\color{brown}, morekeywords={step},
+classoffset=0,
+}
+\lstdefinestyle{customC}{
+    language         = {C},
+    style            = {customText}
+}
+
+\pagestyle{fancy}
+\rhead{\thepage}
+\cfoot{\empty}
+\lhead{\leftmark}
+
+\title{プロジェクト実習２}
+\author{情報工学3年　20122041　中田継太}
+\date{\today}
+\begin{document}
+
+\thispagestyle{empty}
+
+\begin{figure}
+  \center
+  \includegraphics[width=150mm]{jikken-jouhou.pdf}
+\end{figure}
+
+\clearpage
+\setcounter{tocdepth}{2}
+\tableofcontents
+\clearpage
+\twocolumn
+
+\section{理論\cite{cite:riron1}}
+\subsection{DCTについて}
+DCTとはDiscrete Cosine Transform　の略である。
+離散信号を周波数領域へ変換する方法の１つで
+音声圧縮や画像圧縮、映像圧縮などで用いられる。
+離散フーリエ変換（DFT）は複素数を扱うが、
+DCT変換では実数値を扱う。
+\subsection{DCTの計算について}
+ｋ次cos波成分のｎ番目の
+時間インデックス$1<k,n<N$に対応するDCT
+行列$C_{N}$の(k,n)要素$c_{k,n}$は
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=5cm]{riron1.png}
+\end{figure}
+で与えられる。また、$a_k$は
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=4.5cm]{riron2.png}
+\end{figure}
+となる。\\
+$M\times N$空間領域の値を表す実数行列x
+に対する２次元DCT変換XはDCT行列$C_M,C_N$
+を用いて次のように与えることができる。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=2cm]{riron3.png}
+\end{figure}
+
+
+\section{実験の目的\cite{cite:object}}
+全体的な目標は
+映像/画像の圧縮符号化に関する基礎的な考え方やスキルを習得。
+今週の目標は2次元離散コサイン変換の理解である。
+
+\section{実験器具及びツール}
+Scilab
+
+\section{実験内容}
+まず、実習３で
+8×8画像ブロックに対するフィルタ通過後のDCTブロックの圧縮率を求めた。
+次に処理画像と原画像の比較を行った。
+最後に画質がある程度できるフィルタ作成をした。
+画像制作では３つの画像を制作した。
+\begin{enumerate}
+   \item 2次元DCT 変換後のヒストグラムの偏りが，
+  サンプル画像に比べてずっとちいさい，すなわ
+  ちDCT 変換によって期待される圧縮効果が
+  サンプル画像に比べて低い画像
+   \item 謎のフィルタで処理すると，画質が極端に悪
+  化する画像
+   \item 謎のフィルタで処理しても，画質が極端には
+  悪化しない画像
+\end{enumerate}
+
+最後に，8×8 画素ブロックxの
+8×8DCT変換Xの計算を行った。
+
+\section{実習３の結果}
+\subsection{LCFとHCFの圧縮率}
+filt\_LCFとfilt\_HCFの行列に注目すると。
+
+\begin{figure}
+  \begin{verbatim}
+filt_LCF = [
+        0, 0, 1, 1, 1, 1, 1, 1;
+        0, 1, 1, 1, 1, 1, 1, 1;
+        1, 1, 1, 1, 1, 1, 1, 1;
+        1, 1, 1, 1, 1, 1, 1, 1;
+        1, 1, 1, 1, 1, 1, 1, 1;
+        1, 1, 1, 1, 1, 1, 1, 1;
+        1, 1, 1, 1, 1, 1, 1, 1;
+        1, 1, 1, 1, 1, 1, 1, 1 ];
+  \end{verbatim}
+\end{figure}
+
+\begin{figure}
+  \begin{verbatim}
+filt_HCF = [
+        1, 1, 1, 1, 1, 1, 1, 1;
+        1, 1, 1, 1, 1, 1, 1, 0;
+        1, 1, 1, 1, 1, 1, 0, 0;
+        1, 1, 1, 1, 1, 0, 0, 0;
+        1, 1, 1, 1, 0, 0, 0, 0;
+        1, 1, 1, 0, 0, 0, 0, 0;
+        1, 1, 0, 0, 0, 0, 0, 0;
+        1, 0, 0, 0, 0, 0, 0, 0 ];
+  \end{verbatim}
+\end{figure}
+0はその周波数をカットすることを示し、１はその周波数を透過することを意味する。
+圧縮率とはどれだけデータをカットできたかを意味する、
+つまり、フィルタどれだけ０があるかを考えればよい。
+HCFは６４個中３個が０であり、LCFは64個中２８個が０であった。つまり、圧縮率はHCFは$\frac{3}{64}$でLCFは$\frac{28}{64}$である。\\
+また圧縮率はLCFの方が$\frac{28}{3}$倍高い。
+\subsection{LCFとHCFのヒストグラム}
+元の画像とLCFをつかった処理画像を見比べると、視覚的に違いはみつからなかった。(図\ref{pic:img1})また、ヒストグラムの誤差も小さかった。(図\ref{pic:img2})ここから、画質は維持できていることが分かる。\\
+\begin{figure}
+  \centering
+  \includegraphics[width=6cm]{img1.png}
+  \caption{LCFの画像}
+  \label{pic:img1}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=6cm]{img2.png}
+  \caption{LCFのヒストグラム}
+  \label{pic:img2}
+\end{figure}
+一方、元の画像とHCFをつかった処理画像を見比べると、処理画像はエッジ部分だけが抽出されていて、画質が維持されていないことが分かる。(図\ref{pic:img3})
+また、ヒストグラムも見比べると、元画像は、０から２５６まで全体に分布しているが、処理画像は中央にピークが集まっており、違いがあった。ここから、画質は維持できているとはいえない。
+\begin{figure}
+  \centering
+  \includegraphics[width=6cm]{img3.png}
+  \caption{HCFの画像}
+  \label{pic:img3}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=6cm]{img4.png}
+  \caption{HCFのヒストグラム}
+  \label{pic:img4}
+\end{figure}
+\subsection{フィルタの作成}
+LCFを基に圧縮率がより高く，
+かつ画質がある程度維持できるフィルタを作成した。
+
+\begin{figure}
+  \begin{verbatim}
+filt_HCF5 = [
+        1, 1, 1, 1, 0, 0, 0, 0;
+        1, 1, 1, 0, 0, 0, 0, 0;
+        1, 1, 0, 0, 0, 0, 0, 0;
+        1, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0 ];
+  \end{verbatim}
+\end{figure}
+元画像と処理画像は図\ref{pic:HCF5}であり、ヒストグラムは図\ref{pic:HCF5h}である。
+図\ref{pic:HCF5}から分かるように、視覚的には違いはなく、また、図\ref{pic:HCF5h}からヒストグラムも形がいじされていた。
+このことから、画質はいじできていると考えらる。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=5cm]{filter1.png}
+  \caption{HCF5の処理画像}
+  \label{pic:HCF5}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=4.5cm]{HCF5h.png}
+  \caption{HCF5のヒストグラム}
+  \label{pic:HCF5h}
+\end{figure}
+
+まず、HCFを基により、圧縮率が高くなるフィルタを作成するため、HCF5と以下のHCF9,8,7,6を作成した。
+
+HCF９を通した処理画像は図\ref{pic:HCF9}でヒストグラムは図\ref{pic:HCF9h}ある。
+処理画像はまったく画像を映し出されていなかった。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=4.5cm]{HCF9.png}
+  \caption{HCF9の処理画像}
+  \label{pic:HCF9}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=4.5cm]{HCF9h.png}
+  \caption{HCF9のヒストグラム}
+  \label{pic:HCF9h}
+\end{figure}
+HCF８を通した処理画像は図\ref{pic:HCF8}でヒストグラムは図\ref{pic:HCF8h}ある。
+処理画像は図\ref{pic:HCF9}より画質が維持されていた。しかしぼやけていたため、適切でないと判断した。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=4.5cm]{HCF8.png}
+  \caption{HCF8の処理画像}
+  \label{pic:HCF8}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=4.5cm]{HCF8h.png}
+  \caption{HCF8のヒストグラム}
+  \label{pic:HCF8h}
+\end{figure}
+HCF７を通した処理画像は図\ref{pic:HCF7}でヒストグラムは図\ref{pic:HCF7h}ある。
+処理画像は図\ref{pic:HCF8}より画質が維持されていた。しかしグラスや窓の部分などぼやけていた。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=4.5cm]{HCF7.png}
+  \caption{HCF7の処理画像}
+  \label{pic:HCF7}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=4.5cm]{HCF7h.png}
+  \caption{HCF7のヒストグラム}
+  \label{pic:HCF7h}
+\end{figure}
+HCF６を通した処理画像は図\ref{pic:HCF6}でヒストグラムは図\ref{pic:HCF6h}ある。
+処理画像は図\ref{pic:HCF7}より画質が維持されていた。しかし詳しく見ると、ところどころぼやけており、ヒストグラム(図\ref{pic:HCF6h})の６４あたりの凸加減が元画像に比べ維持できていなかった。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=4.5cm]{HCF6.png}
+  \caption{HCF6の処理画像}
+  \label{pic:HCF6}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=4.5cm]{HCF6h.png}
+  \caption{HCF6のヒストグラム}
+  \label{pic:HCF6h}
+\end{figure}
+HCF5を通した処理画像は図\ref{pic:HCF5}でヒストグラムは図\ref{pic:HCF5h}ある。
+元の画像とHCFをつかった処理画像を見比べるとほとんど違いがなく、ヒストグラムも外形がほぼ同じであった。HCF６では６４あたりの凸加減が元画像に比べ維持できていなかったが、HCF5では凸加減ものこされていた。
+以上のことより、画質ができていてかつ、圧縮率が高いフィルタはHCF５であると考えられる。
+圧縮率は0が５４個あるので、$\frac{54}{64}$である。これは元のHCFの圧縮率$\frac{28}{64}$より、約２倍高いものである。
+
+\begin{figure}
+  \begin{verbatim}
+filt_HCF9 = [
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0 ];
+  \end{verbatim}
+\end{figure}
+
+\begin{figure}
+  \begin{verbatim}
+filt_HCF8 = [
+        1, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0 ];
+  \end{verbatim}
+\end{figure}
+
+\begin{figure}
+  \begin{verbatim}
+filt_HCF7 = [
+        1, 1, 0, 0, 0, 0, 0, 0;
+        1, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0 ];
+  \end{verbatim}
+\end{figure}
+
+\begin{figure}
+  \begin{verbatim}
+filt_HCF6 = [
+        1, 1, 1, 0, 0, 0, 0, 0;
+        1, 1, 0, 0, 0, 0, 0, 0;
+        1, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0;
+        0, 0, 0, 0, 0, 0, 0, 0 ];
+  \end{verbatim}
+\end{figure}
+
+\section{画像制作３}
+\subsection{制作１\label{cap:seisaku}}
+2次元DCT 変換後のヒストグラムの偏りが，
+サンプル画像に比べてずっとちいさい画像を制作した。(図\ref{pic:seisaku1})
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=5cm]{seisaku1.png}
+  \caption{制作１の画像}
+  \label{pic:seisaku1}
+\end{figure}
+このときの、DCT変換後のヒストグラムは図\ref{pic:seisaku1h}のようになり、確かにピークが元のもの(図\ref{pic:img4})より小さいものとなった。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=5cm]{seisaku1h.png}
+  \caption{制作１のヒストグラム}
+  \label{pic:seisaku1h}
+\end{figure}
+この画像はサンプル画像にごましおノイズを掛けたものである。ヒストグラムのピークが小さくなるまでノイズをかけた。ピークが中央１２８付近に集まっているということは、抽出できていない周波数が多くあるということを意味している。なので、できるだけかたよりなく多くの周波数が現れるような図が必要となった。ランダムにいろいろな周波数をかけてやる方法として、ノイズがある。ノイズといっても様々であるが、今回は白と黒のノイズがランダムに発生するごましおノイズを採用した。周波数の偏りを抑えることができ、予想通りヒストグラムはピークを抑えることができた。\\
+ちなみに、ノイズが図\ref{pic:seisaku1_1}のようにかけたときはまだ、ピークはのこっていた。そこでさらにノイズをかけ、図\ref{pic:seisaku1}のときになってピークが小さくなった。ノイズはある程度かける必要があることがわかった。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=5cm]{seisaku1_1.png}
+  \caption{ノイズの少ない画像}
+  \label{pic:seisaku1_1}
+\end{figure}
+
+\subsection{制作２}
+謎のフィルタで処理すると，画質が極端に悪
+化する画像 を制作した。(図\ref{pic:nazo1})
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=5cm]{dai3.png}
+  \caption{謎フィルタ画像}
+  \label{pic:nazo1}
+\end{figure}
+謎フィルタは以下のようになっている。これで、横しま成分を透過させ、縦しま成分をカットする。つまり、透過しない縦縞成分を含む画像を制作すれば、画質が悪くなると考えた。
+\begin{figure}
+  \begin{verbatim}
+filt_EXF = [    1, 1, 1, 0, 0, 0, 0, 0;
+                1, 1, 1, 0, 0, 0, 0, 0;
+                1, 1, 1, 0, 0, 0, 0, 0;
+                1, 1, 1, 0, 0, 0, 0, 0;
+                1, 1, 1, 0, 0, 0, 0, 0;
+                1, 1, 1, 0, 0, 0, 0, 0;
+                1, 1, 0, 0, 0, 0, 0, 0;
+                1, 0, 0, 0, 0, 0, 0, 0 ];
+  \end{verbatim}
+\end{figure}
+結果はヒストグラムは図\ref{pic:nazo1_1}のようになった。もとの画像にないような縦じまが増えていることが分かり、画質が維持できていない。また、ヒストグラム（図\ref{pic:nazo1_2}）を見てみると元画像では１２８と１９２付近に２本ピークがあったのに対し、処理画像ではピークは１２８から２２４までいくつも存在し、ヒストグラムからも画質が悪化していることが分かる。
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=5cm]{nazo1_1.png}
+  \caption{謎フィルタの処理画像}
+  \label{pic:nazo1_1}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=5cm]{nazo1_2.png}
+  \caption{謎フィルタのヒストグラム}
+  \label{pic:nazo1_2}
+\end{figure}
+
+\subsection{制作２}
+謎のフィルタで処理しても，画質が極端には
+悪化しない画像 を制作した。(図\ref{pic:nazo2})
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=5cm]{dai4.png}
+  \caption{謎フィルタ画像}
+  \label{pic:nazo2}
+\end{figure}
+謎フィルタは横しま成分を透過させ、縦しま成分をカットする。つまり、透過する横じま成分を含む画像を制作すれば、画質が悪くならないと考えた。
+結果はヒストグラムは図\ref{pic:nazo2_1}のようになった。もとの画像と変わりなく横縞があることが分かり、画質が極端に悪化していない。また、ヒストグラム（図\ref{pic:nazo2_2}）を見てみると元画像と処理画像ではピークが１２８と１９２と二つだけピークがあり、一致している。このことからも画質は極端に悪化していないことが分かる。
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=5cm]{nazo2_1.png}
+  \caption{謎フィルタの処理画像}
+  \label{pic:nazo2_1}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=5cm]{nazo2_2.png}
+  \caption{謎フィルタのヒストグラム}
+  \label{pic:nazo2_2}
+\end{figure}
+
+\section{演習問題４}
+Xの直流成分である$X_{1,1}$を$x_{m,n}$を用いて表せ．
+まず$c_{k,n},X,X_{1,1}$は以下のようになる
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=5cm]{eq1.png}
+\end{figure}
+そして、$C_1$は以下のように書くことができる
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=6cm]{eq2.png}
+\end{figure}
+$x$は以下の行列となる。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=4cm]{eq3.png}
+\end{figure}
+$C_1^T$は$C_1$の転置だから
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=4cm]{eq4.png}
+\end{figure}
+となる。あとは３つの行列の掛け算をしてやると、
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=7.5cm]{eq5.png}
+\end{figure}
+よって$X_{1,1} = \frac{1}{8}\sum_{n=1}^8\sum_{n=1}^8{x_{m,n}}$
+
+\section{考察}
+\ref{cap:seisaku}より画像はノイズをかけてやるとことで
+ピークが小さいものを作成することができた。
+一つの周波数に偏らない図として、全周波数を含むDCT変換基底の画像(図\ref{pic:kousatu1})でもできるのではないのかと考えた。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=5cm]{kousatu1.png}
+  \caption{DCT変換基底}
+  \label{pic:kousatu1}
+\end{figure}
+図\ref{pic:kousatu1}を用いてDCT変換をしてやると、ピークはまだあり、周波数に偏りがあったことが分かった。これは、画像を8×8に分解してやると、一部にある周波数成分が偏ってしまった為だと考えられる。\\
+次に、図\ref{pic:kousatu2}のような画像を作成した。
+8×8ブロックに画像を分割しても、ある部分にある周波数が偏らないようにするため、DCT変換基底を複数つなげた。
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=5cm]{kousatu2.png}
+  \caption{考察による画像}
+  \label{pic:kousatu2}
+\end{figure}
+しかし、ヒストグラムの偏りはまだ大きいままであった。
+恐らく、周波数ごとの境にある白い部分が影響していたのではないかと思われる。より偏りを小さくするために白い部分を取り除いてやる必要があった。
+また、変換基底を複製し用いたが拡大してみると、ドット調になっており、必ずしもこの変換基底がすべての周波数を持っているとは言えない。むしろ、元画像からテキストへコピーするとき、テキストから画像制作の際にもコピーをした結果、画質が落ちていると考えられる。\\
+このように、DCT変換基底を用いたとき予想の結果を得るためにはある程度の時間がかかる。なので、ランダムな周波数を生成していくれるノイズをかける方法は結果の内容でも、コストパフォーマンスもよいと考えられる。
+% \begin{eqnarray*}
+%   c_{k,n}&=&\sqrt{\frac{2}{N}}}a_k cos{\frc{(2n-1)(k-1)\pi}{2N}}\\
+%   X&=&C_s \times x \times C_s^T\\
+%   X_[11]=C_1\timesx\timesC_1^T
+% \end{eqnarray*}
+% \begin{eqnarray*}
+%   C_1&=&[c_{11} c_{12} ... c_{1n}]\\
+%   &=&[\]
+% \end{eqnarray*}
+
+\section{参考文献}
+\begin{thebibliography}{99}
+  \bibitem{cite:riron1}　テキスト13P, 6.4 2次元離散コサイン変換（DCT）
+  \bibitem{cite:object}　第４週目スライド p8 目標
+
+\end{thebibliography}
+
+
+\end{document}
