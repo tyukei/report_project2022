@@ -1,0 +1,376 @@
+\documentclass[a4j]{jsarticle}
+\usepackage{color}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{listings,jlisting}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{amssymb}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{pdfpages}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath}
+
+\lstset{
+backgroundcolor={\color[gray]{.85}},
+basicstyle={\small},
+identifierstyle={\small},
+commentstyle={\small\ttfamily \color[rgb]{0,0.5,0}},
+keywordstyle={\small\bfseries \color[rgb]{0.5,0,0.8}},
+ndkeywordstyle={\small},
+stringstyle={\small\ttfamily \color[rgb]{0,0,1}},
+frame={tb},
+breaklines=true,
+columns=[l]{fullflexible},
+numbers=left,
+xrightmargin=0zw,
+xleftmargin=3zw,
+numberstyle={\scriptsize},
+stepnumber=1,
+numbersep=1zw,
+morecomment=[l]{//}
+}
+\lstdefinestyle{customText}{
+backgroundcolor={\color[gray]{.85}},
+basicstyle={\small},
+identifierstyle={\small},
+commentstyle={\small\ttfamily \color[rgb]{0,0.5,0}},
+keywordstyle={\small\bfseries \color[rgb]{0.5,0,0.8}},
+ndkeywordstyle={\small},
+stringstyle={\small\ttfamily \color[rgb]{0,0,1}},
+frame={tb},
+breaklines=true,
+columns=[l]{fullflexible},
+numbers=left,
+xrightmargin=0zw,
+xleftmargin=3zw,
+numberstyle={\scriptsize},
+stepnumber=1,
+numbersep=1zw,
+morecomment=[l]{//}
+}
+\lstset{
+otherkeywords={Uword,Cpub,step},
+morekeywords={Uword,Cpub,step},
+classoffset=0, keywordstyle=\color{violet}, deletekeywords={step},
+classoffset=1, keywordstyle=\color{brown}, morekeywords={step},
+classoffset=0,
+}
+\lstdefinestyle{customC}{
+    language         = {C},
+    style            = {customText}
+}
+
+\pagestyle{fancy}
+\rhead{\thepage}
+\cfoot{\empty}
+\lhead{\leftmark}
+
+\title{プロジェクト実習２}
+\author{情報工学3年　20122041　中田継太}
+\date{\today}
+\begin{document}
+
+\thispagestyle{empty}
+
+\begin{figure}
+  \center
+  \includegraphics[width=150mm]{hyoushi.pdf}
+\end{figure}
+
+\clearpage
+\setcounter{tocdepth}{2}
+\tableofcontents
+\clearpage
+\twocolumn
+
+\section{理論　\cite{cite:riron}}
+\subsection{YUV形式について}
+YUB形式とはRGV形式を輝度Yと青と輝度の色差Uと赤と輝度の色差Vに変形したものである。
+RGB 形式と同様，それぞれ 8 ビ
+ット(256 値)の精度をもつ．人間の視覚は，輝度
+の違いには敏感だが，色あいの違いにはそれほど敏感でない．
+この性質を利用して，色差 U, V は
+空間的に間引く(ダウンサンプリングされる)こと
+が多い
+RGB から YUV の変換式を以下に示す．
+\begin{equation}\label{equ:yuv}
+  \begin{bmatrix}
+Y \\
+U' \\
+V' \\
+\end{bmatrix}
+=
+  \begin{bmatrix}
+    0.299 &　0.587 &0.144\\
+   -0.169 & -0.331 &0.500\\
+    0.500 & -0.419 &-0.081\\
+  \end{bmatrix}
+  \begin{bmatrix}
+    R\\
+    G\\
+    B\\
+  \end{bmatrix}
+\end{equation}
+\subsection{ネガポジ反転について}
+RGB 画像のネガポジ反転は，各画素の RGB 値それぞれ
+をビット反転させれば実現する．24 ビット RGB
+画像の場合，この操作は\\
+$R←R\oplus0$xff, $G←G\oplus0$xff, $B←V\oplus0$xff \\
+と表現される。
+ここでRGBは画素のRGB
+成分で$\oplus$は排他的論理和(XOR)である．R,G,B 成
+分を符号なし 8 ビット整数とすれば，
+\begin{equation}\label{equ:negaposi}
+  R←255 -R, G←255 -G, B←255 -B
+\end{equation}
+とも表現できる
+
+\section{実験の目的\cite{cite:object}}
+全体的な目標映像/画像の圧縮符号化に関する基礎的な考え方やスキルを習得。
+今週の目標は以下の２点である。
+\begin{itemize}
+  \item カラー画像のRGB形式とYUV形式の相互変換
+  \item YUV形式の導入意義の理解
+\end{itemize}
+
+\section{実験器具及びツール}
+Scilab
+
+\section{実験内容\cite{cite:way}}
+始めにRGBをYUVに変換する実験をおこなった。
+スクリプトのパラメータを変化させ、UV成分の間引きによる画質の影響を調べた。
+次に、どの部分が特に影響を受けたか調べた。
+そして、なぜ、画質に影響が受けたのか考えた。\\
+次に、画像制作の実験を行った。
+UVを間引いて，目視で悪影響のないものであり、かつYUVの各成分のヒストグラムに鋭いピークを示さない画像を作成した。\\
+最後にYUV画像のネガポジ反転の式の導出をおこなった。
+
+\section{実験結果}
+\subsection{実習１}
+image\_yuv.sceはRGBからYUVに変更するスクリプトである。（図\ref{code:image_yuv.sce}）
+image\_yuv.sceのパラメータbw,bhを変更すると、間引き率が変わる。
+今実験ではbw,bhを4から256まで値を変更して実験をおこなった。
+このとき、画像は以下のように変わった。（図\ref{pic:zi1_1}～図\ref{pic:zi1_7})
+
+\begin{figure}[H]
+  \begin{lstlisting}
+function y=mean_MxNblock(x, M,N)
+    [height, width] = size(x);
+    num_br = fix(height/M);
+    num_bc = fix(width/N);
+    // number of block row and coloumn
+
+  for br=1:num_br
+      for bc=1:num_bc
+        y1 = mean(double(x(M*(br-1)+1:M*br, N*(bc-1)+1:N*bc)));
+          y(M*(br-1)+1:M*br, N*(bc-1)+1:N*bc) = y1;
+      end
+  end
+endfunction
+
+bw = 256;                     // block width
+bh = 256;                     // block height
+
+  \end{lstlisting}
+  \caption{image\_yuv.sce}
+  \label{code:image_yuv.sce}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics{zi1_1}
+  \caption{bw=256,bh=256のとき}
+  \label{pic:zi1_1}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics{zi1_2}
+  \caption{bw=128,bh=256のとき}
+  \label{pic:zi1_2}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics{zi1_3}
+  \caption{bw=256,bh=128のとき}
+  \label{pic:zi1_3}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics{zi1_4}
+  \caption{bw=64,bh=64のとき}
+  \label{pic:zi1_4}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics{zi1_5}
+  \caption{bw=16,bh=16のとき}
+  \label{pic:zi1_5}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics{zi1_6}
+  \caption{bw=8,bh=8のとき}
+  \label{pic:zi1_6}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics{zi1_7}
+  \caption{bw=4,bh=4のとき}
+  \label{pic:zi1_7}
+\end{figure}
+
+\section{考察}
+\subsection{間引きによる画質の悪影響について}
+実験結果より、間引きによって処理画像に悪影響が生じたことがわかった。
+本来、色の変化は曲線を描いたり、グラデーションがある。
+例えば、図\ref{pic:zi1_7}は色の変化は滑らかである。しかし、図\ref{pic:zi1_4}は色の変化は目に見える四角のプロック上で変化している。また、図\ref{pic:zi1_3}や図\ref{pic:zi1_2}はさらに色の変化がある縦、横の直線で変化している。
+ブロックの幅を２５６（オリジナルの画像の最大の幅）より大きくすると、濃淡を除く色は１種となる。
+bw,bhを大きくすると、処理画像の色の変化が粗くなる。また、処理画像の色の種類が少なくなると考えられる。
+
+
+\subsection{悪影響の顕著な部分について}
+考察１より間引きによる悪影響があることがわかった。
+ではどのようなところに悪影響ができるのか考えてみる。
+例えば、図\ref{pic:zi1_5}に注目してみる。黄色の風船、赤の風船、青の風船というように正しく処理がされているように見える。しかし、風船と風船の境または風船と床の境に注目すると、ドットアートのように粗い境になっている。
+ここから、風船と風船の境や風船と床といった色が変化する部分で特に悪影響が現れると考えられる。
+
+\subsection{悪影響が生じる理由について}
+ではなぜ、間引きによって悪影響が生じるのか考えてみる。
+間引きをするとき、bw,bhを変更してたので、
+image\_yuv.sceの内容(図\ref{code:image_yuv.sce})を見てみる。
+bw ,bhは　mean\_MxNblock(x,M,N)の引数M,Nになっている。
+また
+num\_br = fix(height/M), num\_bc = fix(height/N)でブロックの高さ、幅を定めている。
+このとき、M、Nを大きくすれば、num\_br, num\_bcが小さくなる。つまり、bh,bwを大きくすることでブロックの数は小さくなる。
+そして、mean()でブロックの範囲に置ける色の平均値をとっている。
+つまり間引き率を上げるとメモリサイズを節約できる代わりに
+UV成分の平均をとる範囲が大きくなり、おおざっぱなデータしか保存されていないことになっている。そのため、間引き率をあげることで悪影響が生じたと考えられる。
+
+
+\subsection{Y成分のヒストグラムについて}
+Y成分は画像の輝度を表し、U成分は青と輝度の色差、V成分は赤と輝度の色差を表している。
+また式(\ref{equ:yuv})より$Y = 0.299R + 0.587G + 0.114B$,
+$ U = 128 - 0.169R - 0.331G + 0.5B$,
+$V = 128 + 0.5R - 0.419G - 0.081B$
+と変形することができる。図\ref{pic:kousatu4}はbw=bh=8のときのヒストグラムである。
+これをみたとき、U,Vは中央値128に集まっていることがわかる。
+U,Vが128のとき上式より
+\begin{eqnarray*}
+   0 &=&-0.169R - 0.331G + 0.5B\\
+   0 &=& 0.5R - 0.419G - 0.081B\\
+\end{eqnarray*}
+が成り立つ。第２式より0.081が他の係数より小さく影響が小さいと考えたとき、
+RとGの成分はほぼ同じかGがやや大きいことが考えられる。
+一方で第１式をみたとき、0.169が他の係数より小さく影響が小さいと考えたとき、
+GとBの成分はほぼ同じかGがやや大きいことが考えられる。
+第１式第２式は同時になりたつので、RとGの成分がほぼ同じでGとBの成分がほぼ同じであるので、
+R,G,Bはほぼ同じ成分量であることが考えられる。すなわち、画像はある色に偏っているのではなく、どの色もまんべんなく使われていることが考えられる。
+実際、風船の色は一色でなく、赤青黄色といったように色とりどりである。\\
+一方でY成分は輝度を表している。輝度とは明かりの度合いのことであり、暗い部分や明るい部分に偏りがあるとき、ヒストグラムは鋭いピークを示す。一方で明るい部分から暗い部分まで存在する画像はヒストグラムは緩やかな山ないし平状を形成する。今回の画像では手間が光で反射していて明るく、奥は陰で暗い部分となっているため、鋭いピークは示さず、緩やかな山を形成していると考えられる。
+
+
+\begin{figure}
+  \centering
+  \includegraphics[width=5cm]{kousatu4.png}
+  \caption{考察４におけるヒストグラム}
+  \label{pic:kousatu4}
+\end{figure}
+
+
+
+\section{画像制作1}
+制約条件をみたすように図\ref{pic:se1_0}の画像を作成した。処理画像は図\ref{pic:se1_1}でヒストグラムは図\ref{pic:se1_2} のようになった。図\ref{pic:se1_1}より制約条件（１）を満たしていることが分かり、図\ref{pic:se1_2}より制約条件(2)を満たしていることが分かる。\\
+考察２より、色が変化する境で顕著に悪影響が見えたことが分かった。このことより
+制約条件（１）「間引き率(縦横共に 8 画素)で UV
+成分を間引いてもサンプル画像より画質の
+悪影響が視覚的に目立たない」 では色の境が明確にならないような画像が好まれる。
+そのため、グラデーションのような画像を選択した。
+また、考察４よりYは色の明るさのバラつきが大きい程、偏りがなく、UとBは色のバラつきが大きい程、偏りがないことが分かった。このことより
+制約条件（２）「YUV 全てのヒストグラムが極端に偏らず，鋭
+いピークも示さない 」では
+画像の明るさと色つきにバラつきがあるものが好まれる。
+そのため、全色あカラーパレットのような画像を選択した。
+以上２つを同時に満たすような画像を図\ref{pic:se1_0}として作成した。
+
+
+\begin{figure}
+  \centering
+  \includegraphics{rainbow.png}
+  \caption{画像制作1に置ける作成画像}
+  \label{pic:se1_0}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=5cm]{se1_1.png}
+  \caption{画像制作1の処理画像}
+  \label{pic:se1_1}
+\end{figure}
+\begin{figure}
+  \centering
+  \includegraphics[width=5cm]{se1_2.png}
+  \caption{画像制作1のヒストグラム}
+  \label{pic:se1_2}
+\end{figure}
+
+\clearpage
+\onecolumn
+
+\section{演習課題１}
+YUV画像のネガポジ反転の操作を導出する。
+$Y_{out}←Y_{in}\oplus0$xff, $U_{out}←U_{in}\oplus0$xff, $V_{out}←V_{in}\oplus0$xff　とする。
+式(\ref{equ:yuv})より$Y = 0.299R + 0.587G + 0.114B$,
+$ U = 128 - 0.169R - 0.331G + 0.5B$,
+$V = 128 + 0.5R - 0.419G - 0.081B$
+と変形することができる。
+ネガポジ変換をするとき
+また式(\ref{equ:negaposi})よりR,B,Gを変形される。
+変形されたRGBを代入することで、ネガポジ変換されたYUBを導出することができる。
+
+
+
+\begin{eqnarray*}
+  Y_{out} &=& 0.299R' + 0.587G' + 0.114B'\\
+  &=& 0.299(255 -R) + 0.587(255 -G) + 0.114(255 -B)\\
+  &=& 255(0.299 + 0.587 + 0.144) -0.299R -0.587G -0.144B\\
+  &=& 255  -(0.299R + 0.587G -0.144B)\\
+  &=& 255 -Y_{in}
+\end{eqnarray*}
+
+\begin{eqnarray*}
+  U_{out} &=& 128 - 0.169R' - 0.331G' + 0.5B'\\
+  &=& 128 - 0.169(255 -R) - 0.331(255 - G) + 0.5(255 - B)\\
+  &=& 128+255(-0.169-0.331+0.5)-(-0.169R-0.331G+ 0.5B) \\
+  &=& 256 - (- 0.169R - 0.331G + 0.5B + 128) \\
+  &=& 256 -U_{in}
+\end{eqnarray*}
+
+\begin{eqnarray*}
+  V_{out} &=& 128 + 0.5R' - 0.419G' - 0.081B'\\
+  &=& 128 + 0.5(255 -R) - 0.419(255 - G) - 0.081(255 - B)\\
+  &=& 128 + 255(0.5 - 0.419 + 0.081) - (0.5R - 0.419G - 0.081B) \\
+  &=& 256 - (0.5R - 0.419G - 0.081B + 128) \\
+  &=& 256 -V_{in}
+\end{eqnarray*}
+
+よって
+\begin{equation*}
+  Y ← 255 -Y, U ← 256 -U, V ← 256 -V
+\end{equation*}
+
+\section{参考文献}
+\begin{thebibliography}{99}
+  \bibitem{cite:riron}　テキスト 信号処理　p11 ６付録
+  \bibitem{cite:object}　第１週目スライド p7 目標
+  \bibitem{cite:way}　第１週目スライド p7 実験内容
+\end{thebibliography}
+
+
+
+\end{document}
